@@ -1,10 +1,7 @@
 package com.java.projeto_usuario.infrastructure.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Table(name = "telefone")
 @Entity
@@ -12,6 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Setter
 @Getter
+@Builder
 
 public class Telefone {
 
