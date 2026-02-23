@@ -24,13 +24,13 @@ public class UsuarioController {
 
     // Mapeamento dos Metodos presentes na UsuarioService
 
-    //Mapeamento do Metodo para salvar o usuario
+    //Mapeamento do Metodo para Salvar o usuario - Post/usuario
     @PostMapping
     public ResponseEntity<UsuarioDTO> salvaUsuario(@RequestBody UsuarioDTO usuarioDTO) {
         return ResponseEntity.ok(usuarioService.salvaUsuario(usuarioDTO));
     }
 
-    //Mapeamento do Login do usario
+    //Mapeamento do Login do usario - POST/usuario/login
     @PostMapping("/login") // O URI adicionou só pode ocrrer no POST
     public String login(@RequestBody UsuarioDTO usuarioDTO){
         Authentication authentication = authenticationManager.authenticate(
@@ -40,16 +40,23 @@ public class UsuarioController {
         return "Bearer" + jwtUtil.generateToken(authentication.getName());
     }
 
-    //Mapeamento do metodo de buscar o usuario por seu Email
+    //Mapeamento do metodo de Buscar o usuario por seu Email - GET/usuario?email=...
     @GetMapping
     public ResponseEntity<Usuario> buscaUsuarioPorEmail(@RequestParam("email") String email){
         return ResponseEntity.ok(usuarioService.buscarUsuarioPorEmail(email));
     }
 
-    //Mapeamente de deletar o usuario por seu Email
+    //Mapeamente de Deletar o usuario por seu Email - DELETE/usuario/...
     @DeleteMapping("/{email}")
     public ResponseEntity<Void> deleteUsuarioPorEmail(@PathVariable String email){
         usuarioService.deleteUsuarioPorEmail(email);
         return ResponseEntity.ok().build();
+    }
+
+    //Mapeamento do metodo de Modificar os Dados do Usuario - PUT/
+    //OBS - Necessário passar as anotacoes para puxar o token
+    @PutMapping
+    public ResponseEntity<UsuarioDTO> atualizaDadosUsuario(@RequestBody UsuarioDTO dto, @RequestHeader("Authorization") String token){
+        return ResponseEntity.ok((usuarioService.atualizarDadosUsuario(token, dto)));
     }
 }
