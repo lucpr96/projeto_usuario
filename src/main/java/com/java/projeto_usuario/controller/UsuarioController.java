@@ -84,4 +84,19 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.atualizarDadosTelefone(id, dto));
     }
 
+
+    //Mapeamento do metodo de Cadastro de Endereco - Post/endereco
+    //OBS - Necessário passar as anotacoes para puxar o token
+    @PostMapping("/endereco")
+    public ResponseEntity<EnderecoDTO> cadastraEndereco(@RequestBody EnderecoDTO dto, @RequestHeader("Authorization") String token){
+        return ResponseEntity.ok(usuarioService.cadastroEndereco(token, dto));
+    }
+
+
+    //Mapeamento do metodo de Cadastro de Telefone - Post/telefone
+    //OBS - Necessário passar as anotacoes para puxar o token
+    @PostMapping("/telefone")
+    public ResponseEntity<TelefoneDTO> cadastraTelefone(@RequestBody TelefoneDTO dto, @RequestHeader("Authorization") String token){
+        return ResponseEntity.ok(usuarioService.cadastroTelefone(token, dto));
+    }
 }
