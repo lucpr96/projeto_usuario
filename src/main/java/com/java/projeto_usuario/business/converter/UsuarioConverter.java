@@ -111,6 +111,9 @@ public class UsuarioConverter {
     }
 
 
+    // Metodos de Conversao:
+
+
     // Metodo para modificar Dados do Usuario - Mescla de dados Usuario Entity - Usuario DTO
     public Usuario updateUsuario(UsuarioDTO usuarioDTO, Usuario entity){
         return Usuario.builder()
@@ -150,4 +153,31 @@ public class UsuarioConverter {
 
                 .build();
     }
+
+
+    // Metodo para converter o dto do Endereco e o Id do Usuario em Endereco Entity
+    public Endereco paraEnderecoEntity(EnderecoDTO dto, Long idUsuario){
+        return Endereco.builder()
+                .rua(dto.getRua())
+                .cidade((dto.getCidade()))
+                .cep(dto.getCep())
+                .complemento(dto.getComplemento())
+                .estado(dto.getEstado())
+                .numero(dto.getNumero())
+                .usuario_id(idUsuario)
+
+                .build();
+    }
+
+
+    // Metodo para converter o dto do Telefone e o Id do Usuario em Telefone Entity
+    public Telefone paraTelefoneEntity(TelefoneDTO dto, Long idUsuario){
+        return Telefone.builder()
+                .ddd(dto.getDdd())
+                .numero(dto.getNumero())
+                .usuario_id(idUsuario)
+
+                .build();
+    }
+
 }
