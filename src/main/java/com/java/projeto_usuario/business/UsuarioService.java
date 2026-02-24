@@ -1,10 +1,16 @@
 package com.java.projeto_usuario.business;
 
 import com.java.projeto_usuario.business.converter.UsuarioConverter;
+import com.java.projeto_usuario.business.dto.EnderecoDTO;
+import com.java.projeto_usuario.business.dto.TelefoneDTO;
 import com.java.projeto_usuario.business.dto.UsuarioDTO;
+import com.java.projeto_usuario.infrastructure.entity.Endereco;
+import com.java.projeto_usuario.infrastructure.entity.Telefone;
 import com.java.projeto_usuario.infrastructure.entity.Usuario;
 import com.java.projeto_usuario.infrastructure.exceptions.ConflictException;
 import com.java.projeto_usuario.infrastructure.exceptions.ResourceNotFoundException;
+import com.java.projeto_usuario.infrastructure.repository.EnderecoRepository;
+import com.java.projeto_usuario.infrastructure.repository.TelefoneRepository;
 import com.java.projeto_usuario.infrastructure.repository.UsuarioRepository;
 import com.java.projeto_usuario.infrastructure.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +27,13 @@ public class UsuarioService {
     private final UsuarioConverter usuarioConverter;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final EnderecoRepository enderecoRepository;
+    private final TelefoneRepository telefoneRepository;
 
-    //Metodos de Salvar, Verificar, Buscar e Deletar
+
+    //Metodos de Salvar, Verificar, Buscar, Deletar, Modificar (usuario), Modificar (endereco), Modificar (telefone)
+
+
 
     //Metodo que ira salvar o usuario no banco de dados, além de encriptar a senha do usuario - POST/usuario
     public UsuarioDTO salvaUsuario(UsuarioDTO usuarioDTO) {
@@ -31,6 +42,8 @@ public class UsuarioService {
         Usuario usuario = usuarioConverter.paraUsuario(usuarioDTO);
         return usuarioConverter.paraUsuarioDTO(usuarioRepository.save(usuario));
     }
+
+
 
     //Metodo que ira verficar se existe o email cadastrado e caso sim, sera retornado uma Exception
     public void emailExiste(String email){
@@ -44,22 +57,35 @@ public class UsuarioService {
         }
     }
 
+
+
     //Metodo que fara a busca de um usuario cadastrado na usuarioRepository - POST/usuario/login
     public boolean verificaEmailExistente(String email){
         return usuarioRepository.existsByEmail(email);
     }
 
+
+
     //Metodo para fazer a busca de Usuario por email - Metodo GET/usuario?email=...
-    public Usuario buscarUsuarioPorEmail(String email){
-        return usuarioRepository.findByEmail(email).orElseThrow(
-                () -> new ResourceNotFoundException("Email não encontrado: " + email));
+    public UsuarioDTO buscarUsuarioPorEmail(String email){
+
+        try {
+            return usuarioConverter.paraUsuarioDTO(usuarioRepository.findByEmail(email).orElseThrow(
+                    () -> new ResourceNotFoundException("Email não encontrado: " + email)));
+
+        } catch (ResourceNotFoundException e){
+            throw new ResourceNotFoundException("Email não encontrado: " + email);
+        }
     }
+
 
 
     //Metodo para fazer o delete do Usuario por email - Metodo DELETE/usuario/...
     public void deleteUsuarioPorEmail(String email){
         usuarioRepository.deleteByEmail(email);
     }
+
+
 
     // Metodo para atualizar os Dados de um Usuario já cadastrado -
     // Através do Token (Bearer - Gerado em POST/login - Pelo Jason Web Token)
@@ -72,15 +98,41 @@ public class UsuarioService {
         dto.setSenha(dto.getSenha() !=null ? passwordEncoder.encode(dto.getSenha()) : null);
 
         //Busca dos dados do usuario no banco de dados
-        Usuario usuarioEntity = usuarioRepository.findByEmail(email).orElseThrow(() ->
+        Usuario usuarioEntityBusca = usuarioRepository.findByEmail(email).orElseThrow(() ->
                 new ResourceNotFoundException("Email não localizado"));
 
         //Mescla dos dados da requisição DTO com os dados do banco de dados
-        Usuario usuario = usuarioConverter.updateUsuario(dto, usuarioEntity);
+        Usuario usuarioConversao = usuarioConverter.updateUsuario(dto, usuarioEntityBusca);
 
         //Foi salvo os dados do usuario convertido e depois foi capturado o retorno e convertido para UsarioDTO
-        return usuarioConverter.paraUsuarioDTO(usuarioRepository.save(usuario));
+        return usuarioConverter.paraUsuarioDTO(usuarioRepository.save(usuarioConversao));
 
+    }
+
+
+
+    //Metodo para Modificar Endereco
+    public EnderecoDTO atualizarDadosEndereco(Long idEndereco, EnderecoDTO enderecoDTO) {
+
+        Endereco EnderecoEntityBusca = enderecoRepository.findById(idEndereco).orElseThrow(() ->
+                new ResourceNotFoundException("Id não encontrado" + idEndereco));
+
+        Endereco enderecoConversao = usuarioConverter.updateEndereco(enderecoDTO, EnderecoEntityBusca);
+
+        return usuarioConverter.paraEnderecoDTO(enderecoRepository.save(enderecoConversao));
+    }
+
+
+
+    //Metodo para Modificar Telefone
+    public TelefoneDTO atualizarDadosTelefone(Long idTelefone, TelefoneDTO telefoneDTO) {
+
+        Telefone TelefoneEntityBusca = telefoneRepository.findById(idTelefone).orElseThrow(() ->
+                new ResourceNotFoundException("Id não encontrado" + idTelefone));
+
+        Telefone telefoneConversao = usuarioConverter.updateTelefone(telefoneDTO, TelefoneEntityBusca);
+
+        return usuarioConverter.paraTelefoneDTO(telefoneRepository.save(telefoneConversao));
     }
 
 }
