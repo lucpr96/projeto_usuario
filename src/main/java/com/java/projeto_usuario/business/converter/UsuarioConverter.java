@@ -16,7 +16,7 @@ public class UsuarioConverter {
 
     // 1 - Conversao de Entity para DTO:
 
-    // Convescao de Atributos
+    // Convercao de Atributos
     public Usuario paraUsuario(UsuarioDTO usuarioDTO) {
         return Usuario.builder()
                 .nome(usuarioDTO.getNome())
